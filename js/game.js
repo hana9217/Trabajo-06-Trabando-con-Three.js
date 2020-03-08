@@ -1,12 +1,12 @@
 //COLORS
 var Colors = {
-    red:0xf25346,
-    white:0xd8d0d1,
-    brown:0x59332e,
-    brownDark:0x23190f,
+    red:0xde4c8a,
+    white:0xad8ddc,
+    brown:0xf54021,
+    brownDark:0x3a4246,
     pink:0xF5986E,
     yellow:0xf4ce93,
-    blue:0x68c3c0,
+    blue:0x8bdcff,
 
 };
 
@@ -103,15 +103,14 @@ var HEIGHT, WIDTH,
 
 function createScene() {
 
-  
-  // Obtenga el ancho y el alto de la pantalla,
+   // Obtenga el ancho y el alto de la pantalla,
   // utilízalos para configurar la relación de aspecto de la cámara
   // y el tamaño del renderizador.
   HEIGHT = window.innerHeight;
   WIDTH = window.innerWidth;
 
-  scene = new THREE.Scene();// crea la escena
-  // crea la camara
+  scene = new THREE.Scene();
+   // crea la camara
   aspectRatio = WIDTH / HEIGHT;
   fieldOfView = 50;
   nearPlane = .1;
@@ -122,8 +121,7 @@ function createScene() {
     nearPlane,
     farPlane
     );
-  
-  
+
   // Agrega un efecto de niebla a la escena; mismo color que el
   // color de fondo utilizado en la hoja de estilo
   scene.fog = new THREE.Fog(0xf7d9aa, 100,950);
@@ -142,12 +140,11 @@ function createScene() {
   // Activar el anti-aliasing; esto es menos eficiente, -> antialias
   // pero, como nuestro proyecto está basado en baja poli, debería estar bien :)
   renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-  
   // Define el tamaño del renderizador; en este caso,
   // llenará toda la pantalla
   renderer.setSize(WIDTH, HEIGHT);
 
-  renderer.shadowMap.enabled = true;// Habilita el renderizado de sombras
+  renderer.shadowMap.enabled = true;
 
   // Agregue el elemento DOM del renderizador al
   // contenedor que creamos en el HTML
@@ -218,27 +215,27 @@ function handleTouchEnd(event){
 var ambientLight, hemisphereLight, shadowLight;
 
 function createLights() {
-  
-  // Una luz hemisférica es una luz de color degradado;
+
+ // Una luz hemisférica es una luz de color degradado;
   // el primer parámetro es el color del cielo, el segundo parámetro es el color de fondo,
   // el tercer parámetro es la intensidad de la luz
   hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0x000000, .9)
 
   // una luz ambiental modifica el color global de una escena y suaviza las sombras
-  ambientLight = new THREE.AmbientLight(0xdc8874, .5);
+  ambientLight = new THREE.AmbientLight(0xFF6666, .5);
   
   // Una luz direccional brilla desde una dirección específica.
   // Actúa como el sol, eso significa que todos los rayos producidos son paralelos.
   shadowLight = new THREE.DirectionalLight(0xffffff, .9);
   
   
-  shadowLight.position.set(150, 350, 350);// Establecer la dirección de la luz
+  shadowLight.position.set(170, 330, 330);// Establecer la dirección de la luz
   shadowLight.castShadow = true;// Permitir proyección de sombras
   // define el área visible de la sombra proyectada
-  shadowLight.shadow.camera.left = -400;
-  shadowLight.shadow.camera.right = 400;
-  shadowLight.shadow.camera.top = 400;
-  shadowLight.shadow.camera.bottom = -400;
+  shadowLight.shadow.camera.left = -200;
+  shadowLight.shadow.camera.right = 200;
+  shadowLight.shadow.camera.top = 200;
+  shadowLight.shadow.camera.bottom = -200;
   shadowLight.shadow.camera.near = 1;
   shadowLight.shadow.camera.far = 1000;
   // define la resolución de la sombra; cuanto más alto mejor
@@ -254,15 +251,15 @@ function createLights() {
   scene.add(shadowLight);
   scene.add(ambientLight);
 
+
 }
 
 
 var Pilot = function(){
   this.mesh = new THREE.Object3D();
   this.mesh.name = "pilot";
-  this.angleHairs=0;// angleHairs es una propiedad utilizada para animar el cabello más 
+  this.angleHairs=0;
 
-  // Cuerpo del piloto
   var bodyGeom = new THREE.BoxGeometry(15,15,15);
   var bodyMat = new THREE.MeshPhongMaterial({color:Colors.brown, shading:THREE.FlatShading});
   var body = new THREE.Mesh(bodyGeom, bodyMat);
@@ -270,26 +267,19 @@ var Pilot = function(){
 
   this.mesh.add(body);
 
-  // Rostro del piloto
   var faceGeom = new THREE.BoxGeometry(10,10,10);
   var faceMat = new THREE.MeshLambertMaterial({color:Colors.pink});
   var face = new THREE.Mesh(faceGeom, faceMat);
   this.mesh.add(face);
 
-  // Elemento de cabello
   var hairGeom = new THREE.BoxGeometry(4,4,4);
   var hairMat = new THREE.MeshLambertMaterial({color:Colors.brown});
   var hair = new THREE.Mesh(hairGeom, hairMat);
-  // Alinee la forma del cabello con su límite inferior, lo que facilitará la escala.
   hair.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,2,0));
-  var hairs = new THREE.Object3D();// crea un contenedor para el cabello
+  var hairs = new THREE.Object3D();
 
-  // crea un contenedor para los pelos en la parte superior
-  // de la cabeza (las que se animarán)
   this.hairsTop = new THREE.Object3D();
 
-  // crea los pelos en la parte superior de la cabeza
-  // y posicionarlos en una cuadrícula de 3 x 4
   for (var i=0; i<12; i++){
     var h = hair.clone();
     var col = i%3;
@@ -302,7 +292,6 @@ var Pilot = function(){
   }
   hairs.add(this.hairsTop);
 
-  // crea los pelos al costado de la cara
   var hairSideGeom = new THREE.BoxGeometry(12,4,2);
   hairSideGeom.applyMatrix(new THREE.Matrix4().makeTranslation(-6,0,0));
   var hairSideR = new THREE.Mesh(hairSideGeom, hairMat);
@@ -312,7 +301,6 @@ var Pilot = function(){
   hairs.add(hairSideR);
   hairs.add(hairSideL);
 
-  // crea los pelos en la parte posterior de la cabeza
   var hairBackGeom = new THREE.BoxGeometry(2,8,10);
   var hairBack = new THREE.Mesh(hairBackGeom, hairMat);
   hairBack.position.set(-1,-4,0)
@@ -366,7 +354,7 @@ var AirPlane = function(){
   // Cabin cabina
 
   var geomCabin = new THREE.BoxGeometry(80,50,50,1,1,1);
-  var matCabin = new THREE.MeshPhongMaterial({color:Colors.red, shading:THREE.FlatShading});
+  var matCabin = new THREE.MeshPhongMaterial({color:Colors.blue, shading:THREE.FlatShading});
 
   // podemos acceder a un vértice específico de una forma a través de
   // la matriz de vértices y luego mueve su propiedad x, y y z:
@@ -533,7 +521,7 @@ Sky = function(){
     // para un mejor resultado, posicionamos las nubes
     // a profundidades aleatorias dentro de la escena
     c.mesh.position.z = -300-Math.random()*500;
-    c.mesh.rotation.z = a + Math.PI/2;/ rotar la nube según su posición
+    c.mesh.rotation.z = a + Math.PI/2;// rotar la nube según su posición
     // también establecemos una escala aleatoria para cada nube
     var s = 1+Math.random()*2;
     c.mesh.scale.set(s,s,s);
@@ -587,12 +575,11 @@ Sea = function(){
   var mat = new THREE.MeshPhongMaterial({
     color:Colors.blue,
     transparent:true,
-    opacity:.8,
+    opacity:.9,
     shading:THREE.FlatShading,
 
   });
 
-    
   // Para crear un objeto en Three.js, tenemos que crear una malla
   // que es una combinación de una geometría y algo de material
   this.mesh = new THREE.Mesh(geom, mat);
@@ -622,7 +609,7 @@ Sea.prototype.moveWaves = function (){
   }
 }
 
-Cloud = function(){   
+Cloud = function(){
   // Crea un contenedor vacío que contendrá las diferentes partes de la nube
   this.mesh = new THREE.Object3D();
   this.mesh.name = "cloud";
@@ -652,10 +639,10 @@ Cloud = function(){
     // permite que cada cubo se lance y reciba sombras
     m.castShadow = true;
     m.receiveShadow = true;
-
   }
   //*/
 }
+
 
 Cloud.prototype.rotate = function(){
   var l = this.mesh.children.length;
